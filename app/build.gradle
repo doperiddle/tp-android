@@ -11,6 +11,13 @@ android {
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        def alchemyApiKey = project.findProperty("ALCHEMY_API_KEY") ?: ""
+        if (alchemyApiKey.isEmpty()) {
+            logger.warn("WARNING: ALCHEMY_API_KEY is not set. " +
+                    "Set it in gradle.properties or via -PALCHEMY_API_KEY=<key> to enable Ethereum WebSocket support.")
+        }
+        buildConfigField "String", "ALCHEMY_API_KEY", "\"${alchemyApiKey}\""
     }
     buildTypes {
         release {
@@ -36,4 +43,5 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'org.greenrobot:eventbus:3.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
