@@ -87,13 +87,16 @@ public class SWTWalletBlockchain implements BaseWalletUtil {
         });
     }
 
+    /**
+     * Jingtum (SWTC) custom Base58 alphabet.
+     * Source: https://github.com/swtcca/jcc_jingtum_base_lib
+     */
+    private static final String SWTC_ALPHABET =
+            "jpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65rkm8oFqi1tuvAxyz";
+
     @Override
     public boolean isWalletLegal(String pk, String address) {
-        //TODO, 这里再做严格限制
-        if (!TextUtils.isEmpty(pk) && !TextUtils.isEmpty(address)) {
-            return true;
-        }
-        return false;
+        return checkWalletPk(pk) && checkWalletAddress(address);
     }
 
     @Override
@@ -160,12 +163,35 @@ public class SWTWalletBlockchain implements BaseWalletUtil {
         if (TextUtils.isEmpty(receiveAddress) || receiveAddress.length() != 34) {
             return false;
         }
+        if (!receiveAddress.startsWith("j")) {
+            return false;
+        }
+        for (char c : receiveAddress.toCharArray()) {
+            if (SWTC_ALPHABET.indexOf(c) == -1) {
+                return false;
+            }
+        }
         return true;
     }
 
     @Override
     public boolean checkWalletPk(String privateKey) {
-        //todo
+        if (TextUtils.isEmpty(privateKey)) {
+            return false;
+        }
+        // SWTC secrets are Base58Check encoded with the Jingtum alphabet,
+        // start with 's', and are typically 28–34 characters long.
+        if (!privateKey.startsWith("s")) {
+            return false;
+        }
+        if (privateKey.length() < 28 || privateKey.length() > 34) {
+            return false;
+        }
+        for (char c : privateKey.toCharArray()) {
+            if (SWTC_ALPHABET.indexOf(c) == -1) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -239,8 +265,12 @@ public class SWTWalletBlockchain implements BaseWalletUtil {
                             item.putString("to", WalletInfoManager.getInstance().getWAddress());
                             item.putString("from", payment.getString("counterparty", ""));
                             dataList.add(item);
+                        } else {
+                            // Surface offer/exchange/unknown types so they appear in history.
+                            item.putString("from", payment.getString("counterparty", ""));
+                            item.putString("to", WalletInfoManager.getInstance().getWAddress());
+                            dataList.add(item);
                         }
-                        //todo 对于type 类型未知，暂不加入记录列表，以免引起困惑
                     }
                     translatedData.put("data", dataList);
                     translatedData.putString("marker", json.getObject("marker", "{}").toString());

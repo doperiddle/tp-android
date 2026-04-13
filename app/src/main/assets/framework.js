@@ -52,7 +52,96 @@ function jtSingtx(params) {
     notifyClient(callid, 0, callbackData);
 }
 
+function importWalletWithWords(params) {
+    var paramsjson = JSON.parse(params);
+    var callid = paramsjson.callid;
+    var words = paramsjson.words;
+    try {
+        var wallet = jingtum.Wallet.fromMnemonic(words);
+        var accountInfo = new Object();
+        accountInfo.blockType = paramsjson.blockType;
+        accountInfo.privatekey = wallet.secret;
+        accountInfo.address = wallet.address;
+        notifyClient(callid, 0, accountInfo);
+    } catch (e) {
+        notifyClient(callid, -1, {error: e.toString()});
+    }
+}
+
 //end jt
+
+//eth
+
+function initEth() {
+    if (typeof Web3 !== 'undefined') {
+        web3 = new Web3();
+    }
+}
+
+function createEthWallet(params) {
+    var paramsjson = JSON.parse(params);
+    var callid = paramsjson.callid;
+    var mnemonic = bip39.generateMnemonic();
+    var seed = bip39.mnemonicToSeed(mnemonic);
+    var hdWallet = hdkey.fromMasterSeed(seed);
+    var key1 = hdWallet.derivePath("m/44'/60'/0'/0/0");
+    var accountInfo = new Object();
+    accountInfo.blockType = paramsjson.blockType;
+    accountInfo.privatekey = key1.getWallet().getPrivateKeyString();
+    accountInfo.address = key1.getWallet().getAddressString();
+    accountInfo.words = mnemonic;
+    notifyClient(callid, 0, accountInfo);
+}
+
+function importEthWalletWithPK(params) {
+    var paramsjson = JSON.parse(params);
+    var callid = paramsjson.callid;
+    var privateKey = paramsjson.privateKey;
+    try {
+        var account = web3.eth.accounts.privateKeyToAccount(privateKey);
+        var accountInfo = new Object();
+        accountInfo.blockType = paramsjson.blockType;
+        accountInfo.privatekey = account.privateKey;
+        accountInfo.address = account.address;
+        notifyClient(callid, 0, accountInfo);
+    } catch (e) {
+        notifyClient(callid, -1, {error: e.toString()});
+    }
+}
+
+function importEthWalletWithWords(params) {
+    var paramsjson = JSON.parse(params);
+    var callid = paramsjson.callid;
+    var words = paramsjson.words;
+    try {
+        var seed = bip39.mnemonicToSeed(words);
+        var hdWallet = hdkey.fromMasterSeed(seed);
+        var key1 = hdWallet.derivePath("m/44'/60'/0'/0/0");
+        var accountInfo = new Object();
+        accountInfo.blockType = paramsjson.blockType;
+        accountInfo.privatekey = key1.getWallet().getPrivateKeyString();
+        accountInfo.address = key1.getWallet().getAddressString();
+        notifyClient(callid, 0, accountInfo);
+    } catch (e) {
+        notifyClient(callid, -1, {error: e.toString()});
+    }
+}
+
+function signEthTransaction(params) {
+    var paramsjson = JSON.parse(params);
+    var callid = paramsjson.callid;
+    var privateKey = paramsjson.privateKey;
+    var tx = paramsjson.transactionToSign;
+    web3.eth.accounts.signTransaction(tx, privateKey).then(function(result) {
+        var callbackData = new Object();
+        callbackData.signedTransaction = result;
+        notifyClient(callid, 0, callbackData);
+    }).catch(function(err) {
+        notifyClient(callid, -1, {error: err.toString()});
+    });
+}
+
+//end eth
 
 
 function notifyClient(callid, ret, extra) {

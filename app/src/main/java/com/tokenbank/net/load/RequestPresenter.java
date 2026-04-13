@@ -123,6 +123,43 @@ public class RequestPresenter {
         });
     }
 
+    public void loadEtherscanData(final ApiRequest request, boolean shouldCache, final RequestCallback requestCallback) {
+        loadDataModel.loadData(request, shouldCache, new LoadDataListener() {
+
+            @Override
+            public void loadSuccess(String result) {
+                if (requestCallback != null) {
+                    GsonUtil jsonResult = new GsonUtil(result);
+                    // Etherscan uses "status":"1" for success, "0" for failure.
+                    // Proxy endpoints (eth_*) return {"jsonrpc":"2.0","result":...} – treat as success.
+                    String status = jsonResult.getString("status", "");
+                    int retCode;
+                    if ("1".equals(status) || status.isEmpty()) {
+                        retCode = 0;
+                    } else {
+                        retCode = -1;
+                    }
+                    requestCallback.onRequesResult(retCode, jsonResult);
+                }
+            }
+
+            @Override
+            public void loadFailed(Throwable throwable, int reqId) {
+                if (requestCallback != null) {
+                    requestCallback.onRequesResult(-1, new GsonUtil("{}"));
+                }
+            }
+
+            @Override
+            public void loadFinish() {
+            }
+        });
+    }
+
+    public void loadEtherscanData(ApiRequest request, final RequestCallback requestCallback) {
+        loadEtherscanData(request, false, requestCallback);
+    }
+
     public void loadJcData(ApiRequest request, final RequestCallback requestCallback) {
         loadJcData(request, false, requestCallback);
     }

@@ -204,7 +204,49 @@ public class TokenTransferActivity extends BaseActivity implements View.OnClickL
         updateBtnToTranferingState();
         if (mBlockChain == TBController.SWT_INDEX) {
             swtTokenTransfer();
+        } else if (mBlockChain == TBController.ETH_INDEX) {
+            ethTokenTransfer();
         }
+    }
+
+    private void ethTokenTransfer() {
+        final com.tokenbank.base.ETHWalletBlockchain ethUtil =
+                (com.tokenbank.base.ETHWalletBlockchain) mWalletUtil;
+        ethUtil.getNonce(mWalletData.waddress, new WCallback() {
+            @Override
+            public void onGetWResult(int ret, GsonUtil extra) {
+                if (ret != 0) {
+                    resetTranferBtn();
+                    ToastUtil.toast(TokenTransferActivity.this,
+                            getString(R.string.toast_transfer_failed) + " nonce error");
+                    return;
+                }
+                long nonce = extra.getLong("nonce", 0L);
+                double amount = com.tokenbank.utils.Util.parseDouble(
+                        mEdtTransferNum.getText().toString());
+                GsonUtil txParams = ethUtil.buildTransactionParams(
+                        mWalletData.waddress,
+                        mEdtWalletAddress.getText().toString(),
+                        amount, mGasPrice, mGas, nonce);
+                GsonUtil signData = new GsonUtil("{}");
+                signData.putString("privateKey", mWalletData.wpk);
+                signData.put("transactionToSign", txParams);
+                mWalletUtil.signedTransaction(signData, new WCallback() {
+                    @Override
+                    public void onGetWResult(int ret, GsonUtil extra) {
+                        if (ret == 0) {
+                            String rawTx = extra.getObject("signedTransaction", "{}")
+                                    .getString("rawTransaction", "");
+                            sendSignedTransaction(rawTx);
+                        } else {
+                            resetTranferBtn();
+                            ToastUtil.toast(TokenTransferActivity.this,
+                                    getString(R.string.toast_transfer_failed) + " sign error");
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void swtTokenTransfer() {
