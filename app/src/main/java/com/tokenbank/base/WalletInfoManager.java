@@ -9,6 +9,7 @@ import com.tokenbank.config.AppConfig;
 import com.tokenbank.config.Constant;
 import com.tokenbank.utils.FileUtil;
 import com.tokenbank.utils.ToastUtil;
+import com.tokenbank.utils.WalletEncryption;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public class WalletInfoManager {
             wallet.wname = FileUtil.getStringFromSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.wname);
             wallet.waddress = FileUtil.getStringFromSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.waddress);
             wallet.whash = FileUtil.getStringFromSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.whash);
-            wallet.wpk = FileUtil.getStringFromSp(AppConfig.getContext(),
-                    Constant.wallet_def_file, Constant.wpk);
+            wallet.wpk = WalletEncryption.decrypt(FileUtil.getStringFromSp(AppConfig.getContext(),
+                    Constant.wallet_def_file, Constant.wpk));
             wallet.words = FileUtil.getStringFromSp(AppConfig.getContext(),
                     Constant.wallet_def_file, Constant.words);
             wallet.isBaked = FileUtil.getBooleanFromSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.baked);
@@ -60,8 +61,8 @@ public class WalletInfoManager {
                                 dwallet.wname = FileUtil.getStringFromSp(AppConfig.getContext(), spFileName, Constant.wname);
                                 dwallet.waddress = FileUtil.getStringFromSp(AppConfig.getContext(), spFileName, Constant.waddress);
                                 dwallet.whash = FileUtil.getStringFromSp(AppConfig.getContext(), spFileName, Constant.whash);
-                                dwallet.wpk = FileUtil.getStringFromSp(AppConfig.getContext(),
-                                        spFileName, Constant.wpk);
+                                dwallet.wpk = WalletEncryption.decrypt(FileUtil.getStringFromSp(AppConfig.getContext(),
+                                        spFileName, Constant.wpk));
                                 dwallet.words = FileUtil.getStringFromSp(AppConfig.getContext(),
                                         spFileName, Constant.words);
                                 wallet.isBaked = FileUtil.getBooleanFromSp(AppConfig.getContext(), spFileName, Constant.baked);
@@ -129,7 +130,7 @@ public class WalletInfoManager {
         FileUtil.putStringToSp(AppConfig.getContext(), spFileName, Constant.waddress, wallet.waddress);
         FileUtil.putStringToSp(AppConfig.getContext(), spFileName, Constant.whash, wallet.whash);
         FileUtil.putStringToSp(AppConfig.getContext(), spFileName, Constant.wpk,
-                wallet.wpk);
+                WalletEncryption.encrypt(wallet.wpk));
         FileUtil.putStringToSp(AppConfig.getContext(), spFileName, Constant.words,
                 wallet.words);
         FileUtil.putBooleanToSp(AppConfig.getContext(), spFileName, Constant.baked, wallet.isBaked);
@@ -250,8 +251,8 @@ public class WalletInfoManager {
         walletData.wname = FileUtil.getStringFromSp(AppConfig.getContext(), spFileName, Constant.wname);
         walletData.waddress = FileUtil.getStringFromSp(AppConfig.getContext(), spFileName, Constant.waddress);
         walletData.whash = FileUtil.getStringFromSp(AppConfig.getContext(), spFileName, Constant.whash);
-        walletData.wpk = FileUtil.getStringFromSp(AppConfig.getContext(),
-                spFileName, Constant.wpk);
+        walletData.wpk = WalletEncryption.decrypt(FileUtil.getStringFromSp(AppConfig.getContext(),
+                spFileName, Constant.wpk));
         walletData.words = FileUtil.getStringFromSp(AppConfig.getContext(),
                 spFileName, Constant.words);
         walletData.isBaked = FileUtil.getBooleanFromSp(AppConfig.getContext(), spFileName, Constant.baked);
@@ -365,8 +366,8 @@ public class WalletInfoManager {
                             dwallet.wname = FileUtil.getStringFromSp(AppConfig.getContext(), fileName, Constant.wname);
                             dwallet.waddress = FileUtil.getStringFromSp(AppConfig.getContext(), fileName, Constant.waddress);
                             dwallet.whash = FileUtil.getStringFromSp(AppConfig.getContext(), fileName, Constant.whash);
-                            dwallet.wpk = FileUtil.getStringFromSp(AppConfig.getContext(),
-                                    fileName, Constant.wpk);
+                            dwallet.wpk = WalletEncryption.decrypt(FileUtil.getStringFromSp(AppConfig.getContext(),
+                                    fileName, Constant.wpk));
                             dwallet.words = FileUtil.getStringFromSp(AppConfig.getContext(),
                                     fileName, Constant.words);
                             dwallet.isBaked = FileUtil.getBooleanFromSp(AppConfig.getContext(), fileName, Constant.baked);
@@ -410,7 +411,7 @@ public class WalletInfoManager {
         FileUtil.putStringToSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.wname, wallet.wname);
         FileUtil.putStringToSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.waddress, wallet.waddress);
         FileUtil.putStringToSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.whash, wallet.whash);
-        FileUtil.putStringToSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.wpk, wallet.wpk);
+        FileUtil.putStringToSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.wpk, WalletEncryption.encrypt(wallet.wpk));
         FileUtil.putStringToSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.words, wallet.words);
         FileUtil.putBooleanToSp(AppConfig.getContext(), Constant.wallet_def_file, Constant.baked, wallet.isBaked);
     }

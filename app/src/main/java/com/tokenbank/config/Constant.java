@@ -21,7 +21,7 @@ public class Constant {
     public final static String asset_visible_key = "asset_visible";
 
     //什么是私钥
-    public final static String privatekey_intro_url = "";
+    public final static String privatekey_intro_url = "https://github.com/TP-Lab/tp-android/wiki/what-is-a-private-key";
 
 
     public final static String sys_prefs = "sys_prefs";
@@ -31,13 +31,13 @@ public class Constant {
    public final static String base_web3_url = "file:///android_asset/web3.html";
 
     //帮助
-    public final static String help_url = "";
+    public final static String help_url = "https://github.com/TP-Lab/tp-android/wiki/help";
 
     //隐私策略
-    public final static String privilege_url = "";
+    public final static String privilege_url = "https://github.com/TP-Lab/tp-android/wiki/privacy-policy";
 
     //服务协议
-    public final static String service_term_url = "";
+    public final static String service_term_url = "https://github.com/TP-Lab/tp-android/wiki/terms-of-service";
 
     //交易查询
     public final static String swt_transaction_search_url = "http://state.jingtum.com/#!/tx/";
@@ -46,6 +46,10 @@ public class Constant {
 
     //jt
     public final static String jt_base_url = "https://api.jingtum.com";
+
+    //eth - Etherscan API (add your API key to ETHERSCAN_API_KEY for production use)
+    public final static String etherscan_base_url = "https://api.etherscan.io/api";
+    public final static String ETHERSCAN_API_KEY = "";
 
     //activity requestCode
     public final static int CHOOSE_BLOCK_REQUEST_CODE = 1001;
